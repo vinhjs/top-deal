@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "async": "^2.6.1",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "request": "^2.88.0"
+  },
+  "name": "top-deal",
+  "version": "1.0.0",
+  "description": "top deal on tiki, lazada,...",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "\"echo no test\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinhjs/top-deal.git"
+  },
+  "keywords": [
+    "topdeal",
+    "tiki",
+    "lazada"
+  ],
+  "author": "vinhjs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinhjs/top-deal/issues"
+  },
+  "homepage": "https://github.com/vinhjs/top-deal#readme"
+}
