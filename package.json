@@ -1,9 +1,10 @@
 {
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^2.6.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
+    "mongodb": "^3.2.3",
     "request": "^2.88.0"
   },
   "name": "top-deal",

@@ -14,13 +14,19 @@ app.use(function(req, res, next) {
     next();
 });
 const port = process.env.PORT || 8001;
-var TiKi = require('./libs/tiki');
-app.get('/tiki', function(req, res){
-  var tiki = new TiKi();
-  tiki.deals(function(data){
-    res.send(data);
-  })
+
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect("mongodb://localhost:27017", function(err, client) {
+  if (client) {
+    var TiKi = require('./libs/tiki');
+    app.get('/tiki', function(req, res){
+      var tiki = new TiKi();
+      tiki.deals(client, req.query, function(data){
+        res.send(data);
+      })
+    })
+    http.listen(port, function () {
+        console.log('App is running on ' + port);
+    });
+  }
 })
-http.listen(port, function () {
-    console.log('App is running on ' + port);
-});

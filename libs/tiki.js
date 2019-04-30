@@ -1,34 +1,57 @@
-var request = require('request');
-var _ = require('lodash');
-var tiki = function(){
-  this.deals = function(cb){
-    request.get({
-      url: "https://tiki.vn/api/v2/events/deals/?category_ids=4221%2C1815%2C1882%2C1883%2C4384%2C2549%2C8322&type=now&page=1&per_page=20"
-    }, function(error, response, body){
-      if (body) {
-        try {
-          let data = JSON.parse(body);
-          let results = [];
-          data.data.forEach(function(item){
-            if(item.discount_percent > 50) {
-              results.push({
-                discount_percent: item.discount_percent,
-                name: item.product.name,
-                url_path: "https://tiki.vn/" + item.product.url_path,
-                price: item.product.price,
+let request = require('request');
+let _ = require('lodash');
+let async = require('async');
+let tiki = function(){
+  this.deals = function(mongodb, params, cb){
+    var db = mongodb.db("topdeal");
+    var Product = db.collection('Product');
 
-              });
+    let category_ids = params.category_ids || '1789%2C4221%2C1815%2C1846%2C1801';
+    let type = params.type || 'now';
+    let len = 200;
+    let page = 1;
+    let total = 0;
+    async.whilst(
+      function() { return len == 200; },
+      function(callback) {
+        let url = "https://tiki.vn/api/v2/events/deals/?category_ids="+category_ids+"&type="+type+"&page="+page+"&per_page=200";
+        console.log(url);
+        request.get({
+          url: url
+        }, function(error, response, body){
+          if (body) {
+            console.log("DONE....", url);
+            try {
+              let data = JSON.parse(body);
+              len = data.data.length;
+              page++;
+              async.forEachLimit(data.data, 10, function(item, cback){
+                item.url_path = "https://tiki.vn/" + item.product.url_path;
+                Product.save(item, function(err, ok) {
+                  if (err) {
+                      console.log(err);
+                  } else {
+                      console.log("OK", ++total, item.product.url_path);
+                  }
+                  cback();
+                })
+              }, function(){
+                callback(null);
+              })
+            } catch(ex) {
+              len = 0;
+              callback(ex);
             }
-          });
-          results = _.sortBy(results, [function(o) { return o.discount_percent; }]);
-          cb(results);
-        } catch(ex) {
-          cb(ex);
-        }
-      } else {
-        cb([])
+          } else {
+            len = 0;
+            callback(null);
+          }
+        })
+      },
+      function (err, n) {
+        cb(err, total);
       }
-    })
+    );
   };
 }
 module.exports = tiki;
